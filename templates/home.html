@@ -13,6 +13,9 @@
       width: 100%;
       object-fit: cover;
     }
+    h4{
+      color: rgb(120,120,120);
+    }
   </style>
 </head>
   
@@ -25,9 +28,12 @@
   </div>
 </body>
   <h2 class="text-center mt-2 mb-4">ipsum</h2>
-  <p class="lead">show jobs here</p>
+  <div >
+    {% for job in jobs%}
+    {% include 'jobItem.html' %}
+    {% endfor %}
+  </div>
   <div class="text-center">
     <button class="btn btn-primary">Contact Us</button>
   </div>
-  
 </html>
