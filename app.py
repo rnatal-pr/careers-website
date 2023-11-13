@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 
@@ -22,7 +22,23 @@ JOBS = [{
 
 @app.route("/")
 def helloWorld():
-  return render_template("home.html", jobs=JOBS)
+  return render_template("home.html", jobs=JOBS, companyName="DigitalBori")
+
+
+@app.route('/apply', methods=['GET', 'POST'])
+def index():
+  if request.method == 'POST':
+    name = request.form['name']
+    lastname = request.form['lastname']
+    email = request.form['email']
+    resume = request.files['resume']
+
+    # tengo que guardar la data
+
+    return render_template('index.html',
+                           message='Form submitted successfully!')
+
+  return render_template('index.html')
 
 
 @app.route("/api/jobs")
