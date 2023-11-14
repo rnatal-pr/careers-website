@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submission Confirmation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h2, p {
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+      <h2>Su solicitud fue sometida con éxito</h2>
+      <p>¡Gracias por su solicitud! Estaremos en contacto en los próximos días.</p>
+
+        <a href="{{ url_for('helloWorld') }}" class="btn btn-primary">Home</a>
+    </div>
+</body>
+</html>
