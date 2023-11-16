@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 import os
-from database import load_jobs_from_db, add_application_to_db, load_job_from_db
+from database import load_jobs_from_db, add_application_to_db
 
 app = Flask(__name__)
 
@@ -13,6 +13,10 @@ os.makedirs(RESUMES_FOLDER, exist_ok=True)
 # Initialize an empty list to store form data
 form_data_list = []
 
+#esto lo pudiera hacer directamente en el DB con un query!!!
+def find_job_by_id(jobs_list, job_id):
+  return next((job for job in jobs_list if job['id'] == job_id), None)
+
 @app.route("/")
 def helloWorld():
   jobs_list = load_jobs_from_db()
@@ -21,7 +25,8 @@ def helloWorld():
 
 @app.route('/apply_form/<int:job_id>', methods=['GET', 'POST'])
 def apply_form(job_id):
-  job_info = load_job_from_db(job_id)
+  jobs_list = load_jobs_from_db()
+  job_info = find_job_by_id(jobs_list, job_id)
   if job_info:
     return render_template('apply_form.html', job=job_info, companyName="DigitalBori")
   else:
@@ -31,6 +36,7 @@ def apply_form(job_id):
 
 @app.route('/apply', methods=['POST'])
 def submit_application():
+  jobs_list = load_jobs_from_db()
   if request.method == 'POST':
     name = request.form['name']
     lastname = request.form['lastname']
@@ -39,15 +45,16 @@ def submit_application():
     job_id = int(request.form.get('job_id'))
 
     # Find the job information based on the job ID
-    job_info = load_job_from_db(job_id)
+    job_info = find_job_by_id(jobs_list, job_id)
+
     if job_info:
       # Generate a unique filename for the resume
       resume_filename = f"{name.lower()}_{lastname.lower()}_{resume.filename}"
-      
+
       # Save the resume file to the "Resumes" folder
       resume_path = os.path.join(RESUMES_FOLDER, resume_filename)
       resume.save(resume_path)
-      
+
       # Storing application to DB
       add_application_to_db(job_id, name, lastname, email, resume_path, resume_filename)
 
