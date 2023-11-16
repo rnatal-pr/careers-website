@@ -1,24 +1,8 @@
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 import os
+from database import load_jobs_from_db
 
 app = Flask(__name__)
-
-JOBS = [{
-    'id': 1,
-    'title': 'Data Analyst',
-    'location': 'Bayamon, PR',
-    'salary': '45k-65k'
-}, {
-    'id': 2,
-    'title': 'Data Scientist',
-    'location': 'Guaynabo, PR',
-    'salary': '55k-75k'
-}, {
-    'id': 3,
-    'title': 'Data Engineer',
-    'location': 'San Juan, PR',
-    'salary': '55k-755k'
-}]
 
 # Set the path for the "Resumes" folder
 RESUMES_FOLDER = os.path.join(os.getcwd(), 'Resumes')
@@ -29,18 +13,19 @@ os.makedirs(RESUMES_FOLDER, exist_ok=True)
 # Initialize an empty list to store form data
 form_data_list = []
 
-
 @app.route("/")
 def helloWorld():
-  return render_template("home.html", jobs=JOBS, companyName="DigitalBori")
+  jobs_list = load_jobs_from_db()
+  return render_template("home.html", jobs=jobs_list, companyName="DigitalBori")
 
 
 @app.route('/apply_form/<int:job_id>', methods=['GET', 'POST'])
 def apply_form(job_id):
-  job_info = next((job for job in JOBS if job['id'] == job_id), None)
+  jobs_list = load_jobs_from_db()
+  job_info = next((job for job in jobs_list if job['id'] == job_id), None)
 
   if job_info:
-    return render_template('apply_form.html', job=job_info)
+    return render_template('apply_form.html', job=job_info, companyName="DigitalBori")
   else:
     # Handle job not found
     return redirect(url_for('helloWorld'))
@@ -48,6 +33,7 @@ def apply_form(job_id):
 
 @app.route('/apply', methods=['POST'])
 def submit_application():
+  jobs_list = load_jobs_from_db()
   if request.method == 'POST':
     name = request.form['name']
     lastname = request.form['lastname']
@@ -56,7 +42,7 @@ def submit_application():
     job_id = int(request.form.get('job_id'))
 
     # Find the job information based on the job ID
-    job_info = next((job for job in JOBS if job['id'] == job_id), None)
+    job_info = next((job for job in jobs_list if job['id'] == job_id), None)
 
     if job_info:
       # Generate a unique filename for the resume
@@ -85,7 +71,6 @@ def submit_application():
   # If the form submission fails or it's not a POST request, stay on the current page
   return render_template('apply_form.html')
 
-
 @app.route("/confirmation")
 def confirmation():
   return render_template("confirmation.html")
@@ -95,10 +80,10 @@ def confirmation():
 def display_form_data():
   return jsonify(form_data_list)
 
-
-@app.route("/api/jobs")
-def list_jobs():
-  return jsonify(JOBS)
+#it is currently giving problems due to row._maping type
+#@app.route("/api/jobs")
+#def list_jobs():
+  #return jsonify(jobs_list)
 
 
 if __name__ == "__main__":
